@@ -19,39 +19,10 @@ let mainStory: Article = {
 }
 
 
-// fake dummy data
-let moreNews: Article[] = [
-    {
-        title: "Dummy Story 1",
-        image_url: "/globe.svg",
-        body: "This is a story.",
-        url: "bloomberg.com",
-        author: "John Doe",
-        publish_date: new Date()
-    },
-    {
-        title: "Dummy Story 2",
-        image_url: "/globe.svg",
-        body: "This is a story.",
-        url: "bloomberg.com",
-        author: "John Doe",
-        publish_date: new Date()
-
-    },
-    {
-        title: "Dummy Story 3",
-        image_url: "/globe.svg",
-        body: "This is a story.",
-        url: "bloomberg.com",
-        author: "John Doe",
-        publish_date: new Date()
-    },
-]
-
 export default function News() {
     // Some helpful info on React states: https://react.dev/reference/react/useState
-    const [articles, setArticles] = useState<Article[]>(moreNews);
-    const [featuredArticle, setFeaturedArticle] = useState<Article>(mainStory);
+    const [articles, setArticles] = useState<Article[]>([]);
+    const [featuredArticle, setFeaturedArticle] = useState<Article | null>(null);
 
     // PART 4: Fetch the data from the API that the backend partner builds to
     //         populate real data to the page.
@@ -64,6 +35,23 @@ export default function News() {
             // Once completing you should be able to see news articles different from the dummy data originally provided.
 
             // Hint: this may be useful to figure how to fetch data: https://medium.com/@bhanu.mt.1501/api-calls-in-react-js-342a09d5315f
+            const articlesResponse = await fetch('/api/news/get-newsfeed', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const featuredArticleResponse = await fetch('/api/news/get-featured-article', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+
+            setArticles(await articlesResponse.json());
+            setFeaturedArticle(await featuredArticleResponse.json());
         }
         fetchData();
     }, [])
@@ -74,10 +62,6 @@ export default function News() {
                 <div className="col-span-4 lg:col-span-3">
                     <FeaturedNewsCard article={featuredArticle} />
                     <NewsFeed articles={articles} />
-
-                    {/* Once you're done with Part 4, feel free to remove the span below! */}
-                    <span className="instruction">Part 4: Connect the backend and fetch real data</span>
-
                 </div>
                 <div className="hidden lg:block col-span-1 overflow-hidden border-l border-slate-300">
                     <div className="flex flex-col gap-4 divide-y divide-slate-300 space-x-2">
